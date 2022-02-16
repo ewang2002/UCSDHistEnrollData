@@ -9,10 +9,24 @@ These are put into the `overall` and `sec` folders, respectively.
 """
 
 from datetime import datetime
+from os.path import exists, join
+import sys
 
+CLEANED_FOLDER = 'cleaned'
+OUT_SEC_FOLDER = 'section'
+OUT_OVERALL_FOLDER = 'overall'
 
-OUT_SEC_FOLDER = './section'
-OUT_OVERALL_FOLDER = './overall'
+if len(sys.argv) != 2:
+    print("Usage: enroll_data_cleaner.py <base folder>")
+    sys.exit(1)
+
+# Get the cleaned folder
+base_folder = sys.argv[-1]
+if not exists(base_folder):
+    print(f"Folder '{base_folder}' does not exist")
+    sys.exit(1)
+
+cleaned_folder = join(base_folder, CLEANED_FOLDER)
 
 # Key = subject + course code (e.g. CSE 100)
 # Value = Dictionary where key = section code (e.g. A01 or 001)
@@ -25,7 +39,7 @@ data_by_sec = {}
 #         and value = [available, waitlisted, total]
 data_by_overall = {}
 
-with open("enrollment.csv", "r") as f:
+with open(join(cleaned_folder, 'enrollment.csv'), "r") as f:
     next(f)
     for line in f:
         line = line.split(',')
@@ -63,7 +77,7 @@ with open("enrollment.csv", "r") as f:
 
 # save overall data into the appropriate folder
 for subj_code in data_by_overall:
-    with open(f'{OUT_OVERALL_FOLDER}/{subj_code}.csv', 'w') as f:
+    with open(join(base_folder, OUT_OVERALL_FOLDER, f'{subj_code}.csv'), 'w') as f:
         f.write('time,available,waitlisted,total,normalized\n')
         for raw_time in data_by_overall[subj_code]:
             time = datetime.fromtimestamp(float(raw_time) / 1000.0) \
@@ -80,7 +94,7 @@ for subj_code in data_by_overall:
 # save section data into the appropriate folder
 for subj_code in data_by_sec:
     for sec_code in data_by_sec[subj_code]:
-        with open(f'{OUT_SEC_FOLDER}/{subj_code}_{sec_code}.csv', 'w') as f:
+        with open(join(base_folder, OUT_SEC_FOLDER, f'{subj_code}_{sec_code}.csv'), 'w') as f:
             f.write('time,available,waitlisted,total,normalized\n')
             for raw_time in data_by_sec[subj_code][sec_code]:
                 time = datetime.fromtimestamp(float(raw_time) / 1000.0) \

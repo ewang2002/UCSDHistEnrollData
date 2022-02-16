@@ -1,6 +1,8 @@
 """
 Gets the biggest difference between available and total seats for some 
 class CSV file. Useful for figuring out which graphs to make.
+
+DEPRECATED
 """
 
 from os import listdir

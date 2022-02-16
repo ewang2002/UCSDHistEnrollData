@@ -14,6 +14,7 @@ DELTA = 10
 def fix_inconsistent_csv(file_name: str, output_file_name: str) -> None:
     lines_changed = 0
     lined_iterated = 0
+    removed = 0
     with open(output_file_name, 'w') as fixed_file:
         with open(file_name, "r") as f:
             init = False 
@@ -27,6 +28,7 @@ def fix_inconsistent_csv(file_name: str, output_file_name: str) -> None:
 
                 # invalid csv row
                 if len(line) < 8:
+                    removed += 1
                     continue
 
                 lined_iterated += 1
@@ -61,7 +63,7 @@ def fix_inconsistent_csv(file_name: str, output_file_name: str) -> None:
                 fixed_file.write(f'{temp_line}')
                 lines_changed += 1
 
-    print(f'Fixed {lines_changed} lines (out of {lined_iterated} total lines).')
+    print(f'Fixed {lines_changed} lines & removed {removed} lines (out of {lined_iterated} total lines).')
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
