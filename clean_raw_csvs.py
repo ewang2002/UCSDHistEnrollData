@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from genericpath import isfile
 from os import listdir, remove
 import sys
@@ -18,7 +18,7 @@ raw_path = join(folder, 'raw')
 
 # Clean all raw files first
 for f in listdir(raw_path):
-    if not isfile(join(raw_path, f)):
+    if not isfile(join(raw_path, f)) or f.endswith('_fixed.csv'):
         continue
     if f.endswith('.csv'):
         new_file_name = join(raw_path, f.replace('.csv', '_fixed.csv'))
@@ -32,7 +32,7 @@ cleaned_path = join(folder, 'cleaned')
 files = [f for f in listdir(raw_path) if isfile(join(raw_path, f)) and f.endswith('_fixed.csv')]
 dict = {}
 for file in files:
-    time = datetime.strptime(file.replace('enrollment_', '').replace('_fixed.csv', ''))
+    time = datetime.strptime(file.replace('enrollment_', '').replace('_fixed.csv', ''), '%Y-%m-%dT%H_%M_%S')
     dict[time] = file
 times = sorted(list(dict.keys()))
 
