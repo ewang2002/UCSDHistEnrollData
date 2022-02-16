@@ -1,4 +1,4 @@
-# UCSD Enrollment Data
+# UCSD Historical Enrollment Data
 A repository that hosts some basic historical enrollment data. 
 
 ## Content
@@ -18,7 +18,10 @@ In general, also note that:
 - The raw files may have some corrupted rows (especially the last rows). This is because I am using a buffered writer, which only occasionally writes to the file. Sometimes, I end up terminating the application before it can write to the file.
 - There may be some gaps in time. For example, there may be time periods of 15+ minutes with no data. Additionally, because WebReg does maintenance at random times, there may be long periods of time with no data. 
 
-Cleaning up was done by the few Python scripts that are in this repository.
+Cleaning up was done by the few Python scripts that are in this repository. So, you're probably interested in the following folders:
+- `cleaned`: A folder containing one CSV file that consists of all CSV files merged together from `raw`.
+- `overall`: A folder containing one CSV file per *course* (e.g. CSE 8A with 2 sections would be put in a file called `CSE 8A.csv`). 
+- `section`: A folder containing one CSV file per *section* (e.g. CSE 8A with 2 sections `A` and `B` would be put in two files called `CSE 8A_A.csv` and `CSE 8A_B.csv`)
 
 ## License
 All files here are licensed under the MIT license.
