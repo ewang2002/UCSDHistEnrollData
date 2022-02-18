@@ -78,33 +78,37 @@ with open(join(cleaned_folder, 'enrollment.csv'), "r") as f:
 # save overall data into the appropriate folder
 for subj_code in data_by_overall:
     with open(join(base_folder, OUT_OVERALL_FOLDER, f'{subj_code}.csv'), 'w') as f:
-        f.write('time,available,waitlisted,total,normalized\n')
+        f.write(
+            'time,available,waitlisted,total,normalized_available,normalized_waitlisted\n')
         for raw_time in data_by_overall[subj_code]:
             time = datetime.fromtimestamp(float(raw_time) / 1000.0) \
                 .isoformat().split('.')[0]
             available = data_by_overall[subj_code][raw_time][0]
             waitlisted = data_by_overall[subj_code][raw_time][1]
             total = data_by_overall[subj_code][raw_time][2]
-            normalized = -1 if total == 0 else available / total 
+            n_available = -1 if total == 0 else available / total
+            n_waitlisted = -1 if total == 0 else waitlisted / total
             f.write(time + ',' + str(data_by_overall[subj_code][raw_time][0]) +
                     ',' + str(data_by_overall[subj_code][raw_time][1]) + ',' +
                     str(data_by_overall[subj_code][raw_time][2]) +
-                    ',' + str(normalized) + '\n')
+                    ',' + str(n_available) + ',' + str(n_waitlisted) + '\n')
 
 # save section data into the appropriate folder
 for subj_code in data_by_sec:
     for sec_code in data_by_sec[subj_code]:
         with open(join(base_folder, OUT_SEC_FOLDER, f'{subj_code}_{sec_code}.csv'), 'w') as f:
-            f.write('time,available,waitlisted,total,normalized\n')
+            f.write(
+                'time,available,waitlisted,total,normalized_available,normalized_waitlisted\n')
             for raw_time in data_by_sec[subj_code][sec_code]:
                 time = datetime.fromtimestamp(float(raw_time) / 1000.0) \
                     .isoformat().split('.')[0]
                 available = data_by_sec[subj_code][sec_code][raw_time][0]
                 waitlisted = data_by_sec[subj_code][sec_code][raw_time][1]
                 total = data_by_sec[subj_code][sec_code][raw_time][2]
-                normalized = -1 if total == 0 else available / total 
+                n_available = -1 if total == 0 else available / total
+                n_waitlisted = -1 if total == 0 else waitlisted / total
                 f.write(time + ',' + str(data_by_sec[subj_code][sec_code][raw_time][0]) +
                         ',' + str(data_by_sec[subj_code][sec_code][raw_time][1]) + ',' +
                         str(data_by_sec[subj_code]
                             [sec_code][raw_time][2]) + ','
-                        + str(normalized) + '\n')
+                        + str(n_available) + ',' + str(n_waitlisted) + '\n')
