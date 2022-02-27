@@ -93,6 +93,21 @@ if __name__ == '__main__':
     in_folder = join(base_folder, OVERALL_FOLDER if dt == 'o' else SECTION_FOLDER)
     all_files = listdir(in_folder)
 
+    # If we're working with sections, we only want the files that appear more than once
+    if dt == 's':
+        file_secs = {}
+        for file in all_files:
+            f_name = file.split('_')[0]
+            if f_name not in file_secs:
+                file_secs[f_name] = [file]
+            else:
+                file_secs[f_name].append(file)
+
+        all_files = []
+        for f_name in file_secs:
+            if len(file_secs[f_name]) > 1:
+                all_files += file_secs[f_name]
+
     # Break all_files into chunks of CHUNK_SIZE
     chunks = [all_files[i:i + CHUNK_SIZE] for i in range(0, len(all_files), CHUNK_SIZE)]
     # Begin running
