@@ -10,7 +10,9 @@ from multiprocessing import Process
 import gc
 
 OVERALL_FOLDER = 'overall'
-PLOT_FOLDER = 'plot'
+OVERALL_PLOT_FOLDER = 'plot_overall'
+SECTION_FOLDER = 'section'
+SECTION_PLOT_FOLDER = 'plot_section'
 CHUNK_SIZE = 30
 PROCESS_COUNT = 4
 
@@ -68,25 +70,36 @@ def process_overall(files: List[str], from_folder: str, out_folder: str):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: plot.py <base folder>")
+    if len(sys.argv) != 3:
+        print("Usage: plot.py <base folder> <s | o>")
         sys.exit(1)
 
     # Get the cleaned folder
-    base_folder = sys.argv[-1]
+    base_folder = sys.argv[-2]
     if not exists(base_folder):
         print(f"Folder '{base_folder}' does not exist")
         sys.exit(1)
 
-    plot_folder = join(base_folder, PLOT_FOLDER)
-    if not exists(join(base_folder, PLOT_FOLDER)):
+    # Get the type of data to process
+    dt = sys.argv[-1]
+    if dt not in ['s', 'o']:
+        print(f"Invalid data type '{dt}' - must be 's' (section) or 'o' (overall)")
+        sys.exit(1)
+
+    plot_folder = join(base_folder, OVERALL_PLOT_FOLDER if dt == 'o' else SECTION_PLOT_FOLDER)
+    if not exists(plot_folder):
         mkdir(plot_folder)
 
-    in_folder = join(base_folder, OVERALL_FOLDER)
+    in_folder = join(base_folder, OVERALL_FOLDER if dt == 'o' else SECTION_FOLDER)
     all_files = listdir(in_folder)
 
-    # Break all_files into chunks of 10
+    # Break all_files into chunks of CHUNK_SIZE
     chunks = [all_files[i:i + CHUNK_SIZE] for i in range(0, len(all_files), CHUNK_SIZE)]
+    # Begin running
+    print(f'Breaking {len(all_files)} files into {len(chunks)} chunks of {CHUNK_SIZE} files each.')
+    print(f'\tInput Folder: {in_folder}')
+    print(f'\tPlot Folder: {plot_folder}')
+    print(f'\tProcesses: {PROCESS_COUNT}')
 
     completed = 0
     while completed < len(chunks):
