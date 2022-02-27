@@ -6,15 +6,22 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from math import floor
 from multiprocessing import Process
 import gc
 
+# Input folders
 OVERALL_FOLDER = 'overall'
-OVERALL_PLOT_FOLDER = 'plot_overall'
 SECTION_FOLDER = 'section'
+# Output folders
+OVERALL_PLOT_FOLDER = 'plot_overall'
 SECTION_PLOT_FOLDER = 'plot_section'
+# Multiprocessing options
 CHUNK_SIZE = 30
 PROCESS_COUNT = 4
+# Plotting options
+NUM_TICKS = 50
+FIGURE_SIZE = (15, 7)
 
 
 def process_overall(files: List[str], from_folder: str, out_folder: str):
@@ -29,14 +36,19 @@ def process_overall(files: List[str], from_folder: str, out_folder: str):
         df = pd.read_csv(join(from_folder, file))
 
         # Adjust the figure so it's big enough for display
-        plt.figure(figsize=(15, 7))
+        plt.figure(figsize=FIGURE_SIZE)
 
         # Plot the number of available & waitlisted seats
         plot = sns.lineplot(data=df, x='time', y='available', color='red', label='Available')
         sns.lineplot(data=df, x='time', y='waitlisted', color='blue', label='Waitlist')
 
         # Modify plot properties to make it more readable
-        plot.set_title(file.replace('.csv', ''))
+        title = file.replace('.csv', '')
+        if '_' in title:
+            course, section = title.split('_')
+            title = f'{course} (Section {section})'
+
+        plot.set_title(title)
         plot.set_xlabel('Time')
         plot.set_ylabel('Seats')
         plot.grid(True)
@@ -49,7 +61,8 @@ def process_overall(files: List[str], from_folder: str, out_folder: str):
         # To make the x-axis more readable, purposely hide some dates and then
         # adjust the labels appropriately
         plt.setp(plot.xaxis.get_majorticklabels(), rotation=45, ha="right")
-        plot.xaxis.set_major_locator(ticker.MultipleLocator(60))
+        # We want NUM_TICKS ticks on the x-axis
+        plot.xaxis.set_major_locator(ticker.MultipleLocator(floor(len(df) / NUM_TICKS)))
 
         # Adjusts the padding
         plt.tight_layout()
