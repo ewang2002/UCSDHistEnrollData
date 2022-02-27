@@ -25,32 +25,31 @@ for f in listdir(raw_path):
         print(f'Cleaning {f}')
         fix_inconsistent_csv.fix_inconsistent_csv(join(raw_path, f), new_file_name)
 
-
 cleaned_path = join(folder, 'cleaned')
 
 # List all files in folder
 files = [f for f in listdir(raw_path) if isfile(join(raw_path, f)) and f.endswith('_fixed.csv')]
-dict = {}
+d = {}
 for file in files:
     time = datetime.strptime(file.replace('enrollment_', '').replace('_fixed.csv', ''), '%Y-%m-%dT%H_%M_%S')
-    dict[time] = file
-times = sorted(list(dict.keys()))
+    d[time] = file
+times = sorted(list(d.keys()))
 
 # Merge the files together
 init = False
 with open(join(cleaned_path, 'enrollment.csv'), 'w') as f:
     for time in times:
-        file = dict[time]
+        file = d[time]
         with open(join(raw_path, file), 'r') as g:
             if init:
                 next(g)
-                
-            for l in g:
+
+            for line in g:
                 if not init:
-                    f.write(f'{l}')
+                    f.write(f'{line}')
                     init = True
                     continue
-                f.write(f'{l}')
+                f.write(f'{line}')
 
 # And then delete the fixed files from the raw directory
 for file in files:
