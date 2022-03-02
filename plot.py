@@ -62,7 +62,7 @@ def process_overall(files: List[str], from_folder: str, out_folder: str):
         # adjust the labels appropriately
         plt.setp(plot.xaxis.get_majorticklabels(), rotation=45, ha="right")
         # We want NUM_TICKS ticks on the x-axis
-        plot.xaxis.set_major_locator(ticker.MultipleLocator(floor(len(df) / NUM_TICKS)))
+        plot.xaxis.set_major_locator(ticker.MultipleLocator(max(floor(len(df) / NUM_TICKS), 1)))
 
         # Adjusts the padding
         plt.tight_layout()
