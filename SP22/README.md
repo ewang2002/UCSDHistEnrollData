@@ -47,6 +47,7 @@ Then, run the `run.sh` script with `SP22` as the only argument to get the new cl
 ## General Notes
 - There may be many CSV files with inaccurate data for the first day or two (e.g. CSE 110, CSE 8A). This is because I was testing the tracker and associated wrapper functions, which had many logic errors at the time.
 - Each course is scraped once every ~8 minutes. This is currently dependent on the number of courses that I decide to scrape. My tracker waits 3 seconds between requests (although I could lower this), and there are 161 courses, so there is a delay of roughly 8.05 minutes (plus some more).
+- Because the cleaned `enrollment.csv` file is too big, it has been omitted. To generate this file again, run `./run.sh SP22`.
 
 ## Other Remarks
 - I do not have data for Feb. 27 and early Feb. 28. This was due to an issue with WebReg giving me a `shibsp::ListenerException` for the day. That being said, since these two dates are after the first week of second pass, very little should have changed during these times. 
