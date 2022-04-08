@@ -118,7 +118,11 @@ PROCESS_COUNT = 6
 def process_overall(files: List[str], from_folder: str, out_folder: str, settings, term: str):
     """
     Processes the folder containing overall data.
-    :param path: The path to the overall folder.
+    :param files: List of files to process
+    :param from_folder: Folder to read from
+    :param out_folder: Folder to write to
+    :param settings: Settings to use
+    :param term: Term to process
     """
     for file in files:
         print(f"\tProcessing {file}.")
