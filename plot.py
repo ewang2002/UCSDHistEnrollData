@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from os import listdir, mkdir
 from os.path import exists, join
 import sys
@@ -12,7 +12,9 @@ from math import floor
 from multiprocessing import Process
 import gc
 
-SETTINGS = {
+# Settings for input/output, basic plot stuff
+GENERAL_SETTINGS = {
+    'id': 'general',
     'overall_plot_folder': 'plot_overall',
     'section_plot_folder': 'plot_section',
 
@@ -21,6 +23,7 @@ SETTINGS = {
 }
 
 WIDE_SETTINGS = {
+    'id': 'wide',
     'overall_plot_folder': 'plot_overall_wide',
     'section_plot_folder': 'plot_section_wide',
 
@@ -28,6 +31,20 @@ WIDE_SETTINGS = {
     'num_ticks': 200
 }
 
+FSP_SETTINGS = {
+    'id': 'fsp',
+    'overall_plot_folder': 'plot_overall_fsp',
+    'section_plot_folder': 'plot_section_fsp',
+
+    'figure_size': (15, 7),
+    'num_ticks': 50
+}
+
+OVERALL_FOLDER = 'overall'
+SECTION_FOLDER = 'section'
+
+
+# Settings pertaining to how vertical line indicators should look
 GRADE_SETTINGS = {
     'Priorities': {
         'line_style': 'dotted',
@@ -84,8 +101,6 @@ QUARTER_SETTINGS = {
     }
 }
 
-OVERALL_FOLDER = 'overall'
-SECTION_FOLDER = 'section'
 
 # Multiprocessing options
 CHUNK_SIZE = 20
@@ -102,6 +117,16 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
 
         # Read in our CSV file
         df = pd.read_csv(join(from_folder, file))
+        if settings['id'] == 'fsp':
+            end_date_str = QUARTER_SETTINGS[term]['End']['d'][1]
+            # Parse this date
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
+            # Filter all rows in df so that the date is earlier than the end date, noting that
+            # the date in df['time'] needs to be converted first
+            df = df[df['time'].apply(lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S") < end_date)]
+
+        if len(df.index) == 0:
+            continue 
 
         # Adjust the figure so it's big enough for display
         plt.figure(figsize=settings['figure_size'])
@@ -139,6 +164,8 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
 
             spans = []
             spans2 = []
+            seen_grades = set()
+            
             for k in QUARTER_SETTINGS[term]:
                 s = QUARTER_SETTINGS[term][k]
                 # index [0, 1] -> 0 = first pass, 1 = second pass
@@ -156,10 +183,11 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
                         'legend': k,
                     })
 
-                    if p == 0:
-                        plt.axvline(x=axis_date[0][0], color=GRADE_SETTINGS[k]['color'], linestyle=GRADE_SETTINGS[k]['line_style'], label=k)
-                    else:
-                        plt.axvline(x=axis_date[0][0], color=GRADE_SETTINGS[k]['color'], linestyle=GRADE_SETTINGS[k]['line_style'])
+                    plt.axvline(x=axis_date[0][0], \
+                        color=GRADE_SETTINGS[k]['color'], \
+                        linestyle=GRADE_SETTINGS[k]['line_style'], \
+                        label=None if k in seen_grades else k)
+                    seen_grades.add(k)
 
             # Note that the reason why I didn't just combine the lists is because I don't want to add the "End" from first pass
             # to the graph. 
@@ -167,12 +195,20 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
             # For first-pass stuff
             for i in range(0, len(spans) - 1):
                 # fill plot between combined_spans[i] and combined_spans[i+1]
-                plt.axvspan(spans[i]['start'], spans[i+1]['start'], color=spans[i]['color'], alpha=0.2, label=spans[i]['legend'])
+                plt.axvspan(spans[i]['start'], \
+                    spans[i+1]['start'], \
+                    color=spans[i]['color'], \
+                    alpha=0.2, \
+                    label=None if k in seen_grades else spans[i]['legend'])
 
             # For second-pass stuff
             for i in range(0, len(spans2) - 1):
                 # fill plot between combined_spans[i] and combined_spans[i+1]
-                plt.axvspan(spans2[i]['start'], spans2[i+1]['start'], color=spans2[i]['color'], alpha=0.2)
+                plt.axvspan(spans2[i]['start'], \
+                    spans2[i+1]['start'], \
+                    color=spans2[i]['color'], \
+                    alpha=0.2, \
+                    label=None if k in seen_grades else spans2[i]['legend'])
  
         plt.legend()
         # Adjusts the padding
@@ -195,7 +231,7 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print("Usage: plot.py <base folder> <s | o>")
+        print("Usage: plot.py <base folder> <'s', 'o', 'sw', 'ow', 'sfsp', 'ofsp'>")
         sys.exit(1)
 
     # Get the cleaned folder
@@ -206,17 +242,28 @@ if __name__ == '__main__':
 
     # Get the type of data to process
     dt = sys.argv[-1]
-    if dt not in ['s', 'o', 'sw', 'ow']:
-        print(f"Invalid data type '{dt}' - must be 's' (section) or 'o' (overall) or 'sw' (sec/wide) or 'ow' (ove/wide)")
+    if dt not in ['s', 'o', 'sw', 'ow', 'sfsp', 'ofsp']:
+        print(f"Invalid data type '{dt}' - must be one of:")
+        print("\t's' (section)")
+        print("\t'o' (overall)")
+        print("\t'sw' (section, wide display)")
+        print("\t'ow' (overall, wide display)")
+        print("\t'sfsp' (section, first/second-pass only)")
+        print("\t'ofsp' (overall, first/second-pass only)")
         sys.exit(1)
 
-    settings_obj = SETTINGS if dt in ['s', 'o'] else WIDE_SETTINGS
+    if dt in ['s', 'o']:
+        settings_obj = GENERAL_SETTINGS
+    elif dt in ['sw', 'ow']:
+        settings_obj = WIDE_SETTINGS
+    elif dt in ['sfsp', 'ofsp']:
+        settings_obj = FSP_SETTINGS
 
-    plot_folder = join(base_folder, settings_obj['overall_plot_folder'] if dt == 'o' or dt == 'ow' else settings_obj['section_plot_folder'])
+    plot_folder = join(base_folder, settings_obj['overall_plot_folder'] if dt in ['o', 'ow', 'ofsp'] else settings_obj['section_plot_folder'])
     if not exists(plot_folder):
         mkdir(plot_folder)
 
-    in_folder = join(base_folder, OVERALL_FOLDER if dt == 'o' or dt == 'ow' else SECTION_FOLDER)
+    in_folder = join(base_folder, OVERALL_FOLDER if dt in ['o', 'ow', 'ofsp'] else SECTION_FOLDER)
     all_files = listdir(in_folder)
 
     # If we're working with sections, we only want the files that appear more than once
