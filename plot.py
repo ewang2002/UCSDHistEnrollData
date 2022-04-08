@@ -88,8 +88,8 @@ OVERALL_FOLDER = 'overall'
 SECTION_FOLDER = 'section'
 
 # Multiprocessing options
-CHUNK_SIZE = 30
-PROCESS_COUNT = 4
+CHUNK_SIZE = 20
+PROCESS_COUNT = 6
 
 
 def process_overall(files: List[str], from_folder: str, out_folder: str, settings, term: str):
