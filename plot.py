@@ -192,6 +192,7 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
             # Note that the reason why I didn't just combine the lists is because I don't want to add the "End" from first pass
             # to the graph. 
 
+            seen_shades = set()
             # For first-pass stuff
             for i in range(0, len(spans) - 1):
                 # fill plot between combined_spans[i] and combined_spans[i+1]
@@ -199,7 +200,8 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
                     spans[i+1]['start'], \
                     color=spans[i]['color'], \
                     alpha=0.2, \
-                    label=None if k in seen_grades else spans[i]['legend'])
+                    label=None if spans[i]['legend'] in seen_shades else spans[i]['legend'])
+                seen_shades.add(spans[i]['legend'])
 
             # For second-pass stuff
             for i in range(0, len(spans2) - 1):
@@ -208,7 +210,8 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
                     spans2[i+1]['start'], \
                     color=spans2[i]['color'], \
                     alpha=0.2, \
-                    label=None if k in seen_grades else spans2[i]['legend'])
+                    label=None if spans2[i]['legend'] in seen_shades else spans2[i]['legend'])
+                seen_shades.add(spans2[i]['legend'])
  
         plt.legend()
         # Adjusts the padding
