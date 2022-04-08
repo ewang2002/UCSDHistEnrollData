@@ -45,28 +45,36 @@ SECTION_FOLDER = 'section'
 
 
 # Settings pertaining to how vertical line indicators should look
+
+PRIORITIES = 'Priorities Start'
+SENIORS = 'Seniors Start'
+JUNIORS = 'Juniors Start'
+SOPHOMORES = 'Sophomores Start'
+FRESHMEN = 'Freshmen Start'
+END = 'End (FP/SP)'
+
 GRADE_SETTINGS = {
-    'Priorities': {
+    PRIORITIES: {
         'line_style': 'dotted',
         'color': '#e06d34' 
     },
-    'Seniors': {
+    SENIORS: {
         'line_style': 'dashed',
         'color': '#42cf1b'
     },
-    'Juniors': {
+    JUNIORS: {
         'line_style': 'dashdot',
         'color': '#11c7d1'
     },
-    'Sophomores': {
+    SOPHOMORES: {
         'line_style': (0, (3, 5, 1, 5, 1, 5)),
         'color': '#6a26d1'
     },
-    'Freshmen': {
+    FRESHMEN: {
         'line_style': (0, (3, 1, 1, 1)),
         'color': '#e0e342'
     },
-    'End': {
+    END: {
         'line_style': 'solid',
         'color': '#000000'
     }
@@ -74,27 +82,27 @@ GRADE_SETTINGS = {
 
 QUARTER_SETTINGS = {
     'SP22': {
-        'Priorities': {
+        PRIORITIES: {
             'd': ['2022-02-12', '2022-02-21'],
             't': 8
         },
-        'Seniors': {
+        SENIORS: {
             'd': ['2022-02-12', '2022-02-21'],
             't': 12
         },
-        'Juniors': {
+        JUNIORS: {
             'd': ['2022-02-15', '2022-02-23'],
             't': 8
         },
-        'Sophomores': {
+        SOPHOMORES: {
             'd': ['2022-02-16', '2022-02-24'],
             't': 8
         },
-        'Freshmen': {
+        FRESHMEN: {
             'd': ['2022-02-17', '2022-02-25'],
             't': 8
         },
-        'End': {
+        END: {
             'd': ['2022-02-18', '2022-02-26'],
             't': 22
         }
@@ -118,7 +126,7 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
         # Read in our CSV file
         df = pd.read_csv(join(from_folder, file))
         if settings['id'] == 'fsp':
-            end_date_str = QUARTER_SETTINGS[term]['End']['d'][1]
+            end_date_str = QUARTER_SETTINGS[term][END]['d'][1]
             # Parse this date
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
             # Filter all rows in df so that the date is earlier than the end date, noting that
@@ -149,13 +157,16 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
 
         # Set bottom-left corner to (0, 0)
         plt.xlim(xmin=0)
-        plt.ylim(ymin=0)
+
+        total = max(df['total'].max(), 1)
+        plt.ylim(ymin=0, ymax=1.05*total)
 
         # To make the x-axis more readable, purposely hide some dates and then
         # adjust the labels appropriately
         plt.setp(plot.xaxis.get_majorticklabels(), rotation=45, ha="right")
         # We want NUM_TICKS ticks on the x-axis
         plot.xaxis.set_major_locator(ticker.MultipleLocator(max(floor(len(df) / settings['num_ticks']), 1)))
+        plot.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
         if QUARTER_SETTINGS[term]: 
             all_dates = df['time'].tolist()
