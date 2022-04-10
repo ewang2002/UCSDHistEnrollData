@@ -112,20 +112,31 @@ QUARTER_SETTINGS = {
 
 # Multiprocessing options
 CHUNK_SIZE = 20
+WIDE_CHUNK_SIZE = 10
 PROCESS_COUNT = 6
 
 
-def process_overall(files: List[str], from_folder: str, out_folder: str, settings, term: str):
+def process_overall(num: int, files: List[str], from_folder: str, out_folder: str, settings, term: str):
     """
     Processes the folder containing overall data.
+    :param num: The process label number (just for identification).
     :param files: List of files to process
     :param from_folder: Folder to read from
     :param out_folder: Folder to write to
     :param settings: Settings to use
     :param term: Term to process
     """
+
+    # Uncomment if you want to skip the images that were already generated
+    temp_files = [f for f in listdir(out_folder) if exists(join(out_folder, f))]
+    completed = 0
     for file in files:
-        print(f"\tProcessing {file}.")
+        print(f"\t[{num}] Processing {file}.")
+        
+        if file.replace('csv', 'png') in temp_files: 
+            completed += 1
+            print(f"\t\t[{num}] Skipped {file} (Completed {completed}/{len(files)}).")
+            continue 
 
         # Read in our CSV file
         df = pd.read_csv(join(from_folder, file))
@@ -138,6 +149,8 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
             df = df[df['time'].apply(lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S") < end_date)]
 
         if len(df.index) == 0:
+            completed += 1
+            print(f"\t\t[{num}] Skipped {file} (Completed {completed}/{len(files)}).")
             continue 
 
         # Adjust the figure so it's big enough for display
@@ -245,6 +258,8 @@ def process_overall(files: List[str], from_folder: str, out_folder: str, setting
         del fig
         del df
         gc.collect()
+        completed += 1
+        print(f"\t\t[{num}] Finished {file} (Completed {completed}/{len(files)}).")
 
 
 if __name__ == '__main__':
@@ -270,10 +285,12 @@ if __name__ == '__main__':
         print("\t'ofsp' (overall, first/second-pass only)")
         sys.exit(1)
 
+    chunk_size = CHUNK_SIZE
     if dt in ['s', 'o']:
         settings_obj = GENERAL_SETTINGS
     elif dt in ['sw', 'ow']:
         settings_obj = WIDE_SETTINGS
+        chunk_size = WIDE_CHUNK_SIZE
     elif dt in ['sfsp', 'ofsp']:
         settings_obj = FSP_SETTINGS
 
@@ -299,10 +316,10 @@ if __name__ == '__main__':
             if len(file_secs[f_name]) > 1:
                 all_files += file_secs[f_name]
 
-    # Break all_files into chunks of CHUNK_SIZE
-    chunks = [all_files[i:i + CHUNK_SIZE] for i in range(0, len(all_files), CHUNK_SIZE)]
+    # Break all_files into chunks of chunk_size
+    chunks = [all_files[i:i + chunk_size] for i in range(0, len(all_files), chunk_size)]
     # Begin running
-    print(f'Breaking {len(all_files)} files into {len(chunks)} chunks of {CHUNK_SIZE} files each.')
+    print(f'Breaking {len(all_files)} files into {len(chunks)} chunks of {chunk_size} files each.')
     print(f'\tWide? {dt == "sw" or dt == "ow"}')
     print(f'\tInput Folder: {in_folder}')
     print(f'\tPlot Folder: {plot_folder}')
@@ -318,7 +335,12 @@ if __name__ == '__main__':
                 break
             print(f'Starting process {i} (completed {completed}/{len(chunks)} chunks).')
             # Create a process to process the chunk
-            p = Process(target=process_overall, args=(chunks[completed + i], in_folder, plot_folder, settings_obj, base_folder.upper()))
+            p = Process(target=process_overall, args=(i, \
+                chunks[completed + i], \
+                in_folder, \
+                plot_folder, \
+                settings_obj, \
+                base_folder.upper()))
             p.start()
             processes.append(p)
         
