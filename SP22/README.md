@@ -8,10 +8,8 @@ I only have enrollment data for:
 - Lower- and upper-division ECE courses.
 - Lower- and upper-division MATH courses.
 
-I plan on supporting more courses in future quarters.
-
 ## Enrollment Time Periods
-Taken from [here](https://blink.ucsd.edu/instructors/courses/enrollment/start.html).
+Taken from [here](https://blink.ucsd.edu/instructors/courses/enrollment/start.html) (note that this may be updated for the most recent quarter).
 
 #### First Pass
 
@@ -46,7 +44,7 @@ Then, run the `run.sh` script with `SP22` as the only argument to get the new cl
 
 ## Intervals
 - Starting February 11, 2022, expect a roughly **8.5 minute interval** between requests to the same course. *This means that, after I make a request for enrollment data for course X, in roughly 8.5 minutes, I will make another request for enrollment data for the same course X.* In general, there is a 3 second delay between requests, and there are 170 courses total.
-- Starting April 9, 2022, expect a roughly **17 minutes interval** between requests to the same course. This is due to the enrollment period for this quarter officially being over, and the fact that I will be tracking the three summer sessions. In general, there is now a 6 second delay between requests instead of a 3 second delay.
+- Starting April 9, 2022, expect a roughly **17 minute interval** between requests to the same course. This is due to the enrollment period for this quarter officially being over, and the fact that I will be tracking the three summer sessions. In general, there is now a 6 second delay between requests instead of a 3 second delay.
 
 ## General Notes
 - There may be many CSV files with inaccurate data for the first day or two (e.g. CSE 110, CSE 8A). In particular, it will look like no one has enrolled in the course for the first few days, and then all of a sudden there is a significant drop. This is because I was testing the tracker and associated wrapper functions, which had many logic errors at the time.
