@@ -31,7 +31,9 @@ cleaned_path = join(folder, 'cleaned')
 files = [f for f in listdir(raw_path) if isfile(join(raw_path, f)) and f.endswith('_fixed.csv')]
 d = {}
 for file in files:
-    time = datetime.strptime(file.replace('enrollment_', '').replace('_fixed.csv', ''), '%Y-%m-%dT%H_%M_%S')
+    time = datetime.strptime(file.replace('enrollment_', '')\
+        .replace('_fixed.csv', '')\
+        .replace(f'_{folder}', ''), '%Y-%m-%dT%H_%M_%S')
     d[time] = file
 times = sorted(list(d.keys()))
 

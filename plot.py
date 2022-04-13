@@ -53,6 +53,10 @@ SOPHOMORES = 'Sophomores Start'
 FRESHMEN = 'Freshmen Start'
 END = 'End (FP/SP)'
 
+# For summer session
+UCSD_STUDENTS = 'UCSD Students Start'
+OTHERS = 'Others Start'
+
 GRADE_SETTINGS = {
     PRIORITIES: {
         'line_style': 'dotted',
@@ -71,6 +75,14 @@ GRADE_SETTINGS = {
         'color': '#6a26d1'
     },
     FRESHMEN: {
+        'line_style': (0, (3, 1, 1, 1)),
+        'color': '#e0e342'
+    },
+    UCSD_STUDENTS: {
+        'line_style': (0, (3, 5, 1, 5, 1, 5)),
+        'color': '#6a26d1'
+    },
+    OTHERS: {
         'line_style': (0, (3, 1, 1, 1)),
         'color': '#e0e342'
     },
@@ -104,6 +116,34 @@ QUARTER_SETTINGS = {
         },
         END: {
             'd': ['2022-02-18', '2022-02-26'],
+            't': 22
+        }
+    },
+    'S122': {
+        UCSD_STUDENTS: {
+            'd': ['2022-04-11'],
+            't': 8
+        },
+        OTHERS: {
+            'd': ['2022-04-18'],
+            't': 8
+        },
+        END: {
+            'd': ['2022-06-20'],
+            't': 22
+        }
+    },
+    'S222': {
+        UCSD_STUDENTS: {
+            'd': ['2022-04-11'],
+            't': 8
+        },
+        OTHERS: {
+            'd': ['2022-04-18'],
+            't': 8
+        },
+        END: {
+            'd': ['2022-07-25'],
             't': 22
         }
     }
@@ -157,7 +197,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
         plt.figure(figsize=settings['figure_size'])
 
         # Plot the number of available & waitlisted seats
-        plot = sns.lineplot(data=df, x='time', y='available', color='red', label='Available')
+        plot = sns.lineplot(data=df, x='time', y='enrolled', color='red', label='Enrolled')
         sns.lineplot(data=df, x='time', y='waitlisted', color='blue', label='Waitlist')
 
         # Modify plot properties to make it more readable
@@ -186,6 +226,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
         plot.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
         if QUARTER_SETTINGS[term]: 
+            p_max = 2 if SENIORS in QUARTER_SETTINGS[term] else 1
             all_dates = df['time'].tolist()
             # map all dates in all_dates to a tuple of string date and datetime object
             all_dates: Tuple[str, datetime] = list(map(lambda x: (x, datetime.strptime(x, "%Y-%m-%dT%H:%M:%S")), all_dates))
@@ -197,7 +238,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
             for k in QUARTER_SETTINGS[term]:
                 s = QUARTER_SETTINGS[term][k]
                 # index [0, 1] -> 0 = first pass, 1 = second pass
-                for p in range(0, 2):
+                for p in range(0, p_max):
                     hr = s['t']
                     date = s['d'][p]
                     # find the first date in all_dates whose date is equal to date

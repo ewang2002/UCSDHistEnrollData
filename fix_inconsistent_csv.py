@@ -23,12 +23,12 @@ def fix_inconsistent_csv(file_name: str, output_file_name: str) -> None:
             for l in f:
                 line = l.split(',')
                 # remove meeting column
-                if len(line) == 9:
-                    line.pop()
-                    line[-1] += '\n'
+                # if len(line) == 9:
+                #    line.pop()
+                #    line[-1] += '\n'
 
                 # invalid csv row
-                if len(line) < 8:
+                if len(line) < 9:
                     removed += 1
                     continue
 
@@ -53,12 +53,12 @@ def fix_inconsistent_csv(file_name: str, output_file_name: str) -> None:
                     prev_time = time
                     continue
 
-                    # Same time
+                # Same time
                 if time == prev_time:
                     fixed_file.write(f'{temp_line}')
                     continue
 
-                    # Problematic line
+                # Problematic line
                 line[0] = str(prev_time)
                 temp_line = ','.join(line)
                 fixed_file.write(f'{temp_line}')

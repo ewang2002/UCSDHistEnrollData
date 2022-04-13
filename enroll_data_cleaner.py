@@ -49,6 +49,7 @@ with open(join(cleaned_folder, 'enrollment.csv'), "r") as f:
         available_seats = int(line[5])
         waitlisted = int(line[6])
         total = int(line[7])
+        enrolled = int(line[8])
 
         if subj_course not in data_by_sec:
             data_by_sec[subj_course] = {}
@@ -62,53 +63,59 @@ with open(join(cleaned_folder, 'enrollment.csv'), "r") as f:
             data_by_sec[subj_course][sec_code_first] = {}
 
         if time not in data_by_sec[subj_course][sec_code_first]:
-            data_by_sec[subj_course][sec_code_first][time] = [0, 0, 0]
+            data_by_sec[subj_course][sec_code_first][time] = [0, 0, 0, 0]
 
         if time not in data_by_overall[subj_course]:
-            data_by_overall[subj_course][time] = [0, 0, 0]
+            data_by_overall[subj_course][time] = [0, 0, 0, 0]
 
         data_by_sec[subj_course][sec_code_first][time][0] += available_seats
         data_by_sec[subj_course][sec_code_first][time][1] += waitlisted
         data_by_sec[subj_course][sec_code_first][time][2] += total
+        data_by_sec[subj_course][sec_code_first][time][3] += enrolled
 
         data_by_overall[subj_course][time][0] += available_seats
         data_by_overall[subj_course][time][1] += waitlisted
         data_by_overall[subj_course][time][2] += total
+        data_by_overall[subj_course][time][3] += enrolled
 
 # save overall data into the appropriate folder
 for subj_code in data_by_overall:
     with open(join(base_folder, OUT_OVERALL_FOLDER, f'{subj_code}.csv'), 'w') as f:
         f.write(
-            'time,available,waitlisted,total,normalized_available,normalized_waitlisted\n')
+            'time,enrolled,available,waitlisted,total,normalized_available,normalized_waitlisted,normalized_enrolled\n')
         for raw_time in data_by_overall[subj_code]:
             time = datetime.fromtimestamp(float(raw_time) / 1000.0) \
                 .isoformat().split('.')[0]
             available = data_by_overall[subj_code][raw_time][0]
             waitlisted = data_by_overall[subj_code][raw_time][1]
             total = data_by_overall[subj_code][raw_time][2]
+            enrolled = data_by_overall[subj_code][raw_time][3]
             n_available = -1 if total == 0 else available / total
             n_waitlisted = -1 if total == 0 else waitlisted / total
-            f.write(time + ',' + str(data_by_overall[subj_code][raw_time][0]) +
-                    ',' + str(data_by_overall[subj_code][raw_time][1]) + ',' +
-                    str(data_by_overall[subj_code][raw_time][2]) +
-                    ',' + str(n_available) + ',' + str(n_waitlisted) + '\n')
+            n_enrolled = -1 if total == 0 else enrolled / total
+            f.write(time + ',' + str(enrolled) + ',' + str(available) +
+                    ',' + str(waitlisted) + ',' + str(total) + ',' + str(n_available) 
+                    + ',' + str(n_waitlisted) + ',' + str(n_enrolled) + '\n')
 
 # save section data into the appropriate folder
 for subj_code in data_by_sec:
+    if len(data_by_sec[subj_code]) == 1:
+        continue 
+    
     for sec_code in data_by_sec[subj_code]:
         with open(join(base_folder, OUT_SEC_FOLDER, f'{subj_code}_{sec_code}.csv'), 'w') as f:
             f.write(
-                'time,available,waitlisted,total,normalized_available,normalized_waitlisted\n')
+            'time,enrolled,available,waitlisted,total,normalized_available,normalized_waitlisted,normalized_enrolled\n')
             for raw_time in data_by_sec[subj_code][sec_code]:
                 time = datetime.fromtimestamp(float(raw_time) / 1000.0) \
                     .isoformat().split('.')[0]
                 available = data_by_sec[subj_code][sec_code][raw_time][0]
                 waitlisted = data_by_sec[subj_code][sec_code][raw_time][1]
                 total = data_by_sec[subj_code][sec_code][raw_time][2]
+                enrolled = data_by_sec[subj_code][sec_code][raw_time][3]
                 n_available = -1 if total == 0 else available / total
                 n_waitlisted = -1 if total == 0 else waitlisted / total
-                f.write(time + ',' + str(data_by_sec[subj_code][sec_code][raw_time][0]) +
-                        ',' + str(data_by_sec[subj_code][sec_code][raw_time][1]) + ',' +
-                        str(data_by_sec[subj_code]
-                            [sec_code][raw_time][2]) + ','
-                        + str(n_available) + ',' + str(n_waitlisted) + '\n')
+                n_enrolled = -1 if total == 0 else enrolled / total
+                f.write(time + ',' + str(enrolled) + ',' + str(available) +
+                        ',' + str(waitlisted) + ',' + str(total) + ',' + str(n_available) 
+                        + ',' + str(n_waitlisted) + ',' + str(n_enrolled) + '\n')
