@@ -11,6 +11,7 @@ import matplotlib.ticker as ticker
 from math import floor
 from multiprocessing import Process
 import gc
+import importlib
 
 # Settings for input/output, basic plot stuff
 GENERAL_SETTINGS = {
@@ -44,111 +45,14 @@ OVERALL_FOLDER = 'overall'
 SECTION_FOLDER = 'section'
 
 
-# Settings pertaining to how vertical line indicators should look
-
-PRIORITIES = 'Priorities Start'
-SENIORS = 'Seniors Start'
-JUNIORS = 'Juniors Start'
-SOPHOMORES = 'Sophomores Start'
-FRESHMEN = 'Freshmen Start'
-END = 'End (FP/SP)'
-
-# For summer session
-UCSD_STUDENTS = 'UCSD Students Start'
-OTHERS = 'Others Start'
-
-GRADE_SETTINGS = {
-    PRIORITIES: {
-        'line_style': 'dotted',
-        'color': '#e06d34' 
-    },
-    SENIORS: {
-        'line_style': 'dashed',
-        'color': '#42cf1b'
-    },
-    JUNIORS: {
-        'line_style': 'dashdot',
-        'color': '#11c7d1'
-    },
-    SOPHOMORES: {
-        'line_style': (0, (3, 5, 1, 5, 1, 5)),
-        'color': '#6a26d1'
-    },
-    FRESHMEN: {
-        'line_style': (0, (3, 1, 1, 1)),
-        'color': '#e0e342'
-    },
-    UCSD_STUDENTS: {
-        'line_style': (0, (3, 5, 1, 5, 1, 5)),
-        'color': '#6a26d1'
-    },
-    OTHERS: {
-        'line_style': (0, (3, 1, 1, 1)),
-        'color': '#e0e342'
-    },
-    END: {
-        'line_style': 'solid',
-        'color': '#000000'
-    }
-}
-
-QUARTER_SETTINGS = {
-    'SP22': {
-        PRIORITIES: {
-            'd': ['2022-02-12', '2022-02-21'],
-            't': 8
-        },
-        SENIORS: {
-            'd': ['2022-02-12', '2022-02-21'],
-            't': 12
-        },
-        JUNIORS: {
-            'd': ['2022-02-15', '2022-02-23'],
-            't': 8
-        },
-        SOPHOMORES: {
-            'd': ['2022-02-16', '2022-02-24'],
-            't': 8
-        },
-        FRESHMEN: {
-            'd': ['2022-02-17', '2022-02-25'],
-            't': 8
-        },
-        END: {
-            'd': ['2022-02-18', '2022-02-26'],
-            't': 22
-        }
-    },
-    'S122': {
-        UCSD_STUDENTS: {
-            'd': ['2022-04-11'],
-            't': 8
-        },
-        OTHERS: {
-            'd': ['2022-04-18'],
-            't': 8
-        },
-        END: {
-            'd': ['2022-06-20'],
-            't': 22
-        }
-    },
-    'S222': {
-        UCSD_STUDENTS: {
-            'd': ['2022-04-11'],
-            't': 8
-        },
-        OTHERS: {
-            'd': ['2022-04-18'],
-            't': 8
-        },
-        END: {
-            'd': ['2022-07-25'],
-            't': 22
-        }
-    }
-}
-
+# For the plotconfig.py file
+MARKERS = "markers"
+MARKER_DATES = 'd'
+MARKER_TIME = 't'
+LINE_STYLE = 'l'
+LINE_COLOR = 'c'
+NAME_OF_MARKER = 'n'
+CONFIG_SETTINGS = 'settings'
 
 # Multiprocessing options
 CHUNK_SIZE = 20
@@ -156,7 +60,7 @@ WIDE_CHUNK_SIZE = 10
 PROCESS_COUNT = 6
 
 
-def process_overall(num: int, files: List[str], from_folder: str, out_folder: str, settings, term: str):
+def process_overall(num: int, files: List[str], from_folder: str, out_folder: str, settings, config):
     """
     Processes the folder containing overall data.
     :param num: The process label number (just for identification).
@@ -164,24 +68,25 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
     :param from_folder: Folder to read from
     :param out_folder: Folder to write to
     :param settings: Settings to use
-    :param term: Term to process
+    :param config: The configuration object, from the plotconfig.py file.
     """
 
     # Uncomment if you want to skip the images that were already generated
-    temp_files = [f for f in listdir(out_folder) if exists(join(out_folder, f))]
+    # temp_files = [f for f in listdir(out_folder) if exists(join(out_folder, f))]
     completed = 0
     for file in files:
         print(f"\t[{num}] Processing {file}.")
         
-        if file.replace('csv', 'png') in temp_files: 
-            completed += 1
-            print(f"\t\t[{num}] Skipped {file} (Completed {completed}/{len(files)}).")
-            continue 
+        #if file.replace('csv', 'png') in temp_files: 
+        #    completed += 1
+        #    print(f"\t\t[{num}] Skipped {file} (Completed {completed}/{len(files)}).")
+        #    continue 
 
         # Read in our CSV file
         df = pd.read_csv(join(from_folder, file))
         if settings['id'] == 'fsp':
-            end_date_str = QUARTER_SETTINGS[term][END]['d'][1]
+            assert "end" in config[MARKERS][-1][NAME_OF_MARKER].lower()
+            end_date_str = config[MARKERS][-1][MARKER_DATES][-1]
             # Parse this date
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
             # Filter all rows in df so that the date is earlier than the end date, noting that
@@ -197,9 +102,20 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
         plt.figure(figsize=settings['figure_size'])
 
         # Plot the number of available & waitlisted seats
-        plot = sns.lineplot(data=df, x='time', y='enrolled', color='red', label='Enrolled')
-        sns.lineplot(data=df, x='time', y='waitlisted', color='blue', label='Waitlist')
+        if config[CONFIG_SETTINGS]['showTotal']:
+            sns.lineplot(data=df, x='time', y='total', color='purple', label='Total Seats', linestyle='--')
+            max_y = df['total'].max()
 
+        if config[CONFIG_SETTINGS]['useEnrolledTtl']:
+            sns.lineplot(data=df, x='time', y='enrolled', color='red', label='Enrolled', linewidth=2)
+            max_y = max(df['enrolled'].max(), max_y)
+        else:
+            sns.lineplot(data=df, x='time', y='available', color='red', label='Available', linewidth=2)
+            max_y = max(df['available'].max(), max_y)
+        
+        sns.lineplot(data=df, x='time', y='waitlisted', color='blue', label='Waitlist', linewidth=2)
+
+        plot = plt.gca()
         # Modify plot properties to make it more readable
         title = file.replace('.csv', '')
         if '_' in title:
@@ -214,9 +130,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
 
         # Set bottom-left corner to (0, 0)
         plt.xlim(xmin=0)
-
-        total = max(df['total'].max(), 1)
-        plt.ylim(ymin=0, ymax=1.05*total)
+        plt.ylim(ymin=0, ymax=1.05*max_y)
 
         # To make the x-axis more readable, purposely hide some dates and then
         # adjust the labels appropriately
@@ -225,8 +139,8 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
         plot.xaxis.set_major_locator(ticker.MultipleLocator(max(floor(len(df) / settings['num_ticks']), 1)))
         plot.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
-        if term in QUARTER_SETTINGS: 
-            p_max = 2 if SENIORS in QUARTER_SETTINGS[term] else 1
+        if config[CONFIG_SETTINGS]['useMarkers']: 
+            p_max = 2 if config[CONFIG_SETTINGS]['isNormal'] else 1
             all_dates = df['time'].tolist()
             # map all dates in all_dates to a tuple of string date and datetime object
             all_dates: Tuple[str, datetime] = list(map(lambda x: (x, datetime.strptime(x, "%Y-%m-%dT%H:%M:%S")), all_dates))
@@ -235,12 +149,11 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
             spans2 = []
             seen_grades = set()
             
-            for k in QUARTER_SETTINGS[term]:
-                s = QUARTER_SETTINGS[term][k]
+            for marker in config[MARKERS]:
                 # index [0, 1] -> 0 = first pass, 1 = second pass
                 for p in range(0, p_max):
-                    hr = s['t']
-                    date = s['d'][p]
+                    hr = marker[MARKER_TIME]
+                    date = marker[MARKER_DATES][p]
                     # find the first date in all_dates whose date is equal to date
                     # and has the closest hour to hr
                     axis_date = list(filter(lambda x: x[1].strftime("%Y-%m-%d") == date and x[1].hour == hr, all_dates))
@@ -248,15 +161,15 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
                         continue
                     (spans if p == 0 else spans2).append({
                         'start': axis_date[0][0],
-                        'color': GRADE_SETTINGS[k]['color'],
-                        'legend': k,
+                        'color': marker[LINE_COLOR],
+                        'legend': marker[NAME_OF_MARKER],
                     })
 
                     plt.axvline(x=axis_date[0][0], \
-                        color=GRADE_SETTINGS[k]['color'], \
-                        linestyle=GRADE_SETTINGS[k]['line_style'], \
-                        label=None if k in seen_grades else k)
-                    seen_grades.add(k)
+                        color=marker[LINE_COLOR], \
+                        linestyle=marker[LINE_STYLE], \
+                        label=None if marker[NAME_OF_MARKER] in seen_grades else marker[NAME_OF_MARKER])
+                    seen_grades.add(marker[NAME_OF_MARKER])
 
             # Note that the reason why I didn't just combine the lists is because I don't want to add the "End" from first pass
             # to the graph. 
@@ -326,6 +239,13 @@ if __name__ == '__main__':
         print("\t'ofsp' (overall, first/second-pass only)")
         sys.exit(1)
 
+    # Get the relevant configuration object
+    try: 
+        config = importlib.import_module(f'{base_folder}.plotconfig').CONFIG
+    except ModuleNotFoundError:
+        print(f'{base_folder} does not contain a plotconfig.py file. Please set one up and then try again.')
+        exit(1)
+
     chunk_size = CHUNK_SIZE
     if dt in ['s', 'o']:
         settings_obj = GENERAL_SETTINGS
@@ -381,7 +301,7 @@ if __name__ == '__main__':
                 in_folder, \
                 plot_folder, \
                 settings_obj, \
-                base_folder.upper()))
+                config))
             p.start()
             processes.append(p)
         
