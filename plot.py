@@ -225,7 +225,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
         plot.xaxis.set_major_locator(ticker.MultipleLocator(max(floor(len(df) / settings['num_ticks']), 1)))
         plot.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
-        if QUARTER_SETTINGS[term]: 
+        if term in QUARTER_SETTINGS: 
             p_max = 2 if SENIORS in QUARTER_SETTINGS[term] else 1
             all_dates = df['time'].tolist()
             # map all dates in all_dates to a tuple of string date and datetime object
