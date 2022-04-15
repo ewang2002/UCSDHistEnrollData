@@ -103,9 +103,12 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
 
         # Plot the number of available & waitlisted seats
         if config[CONFIG_SETTINGS]['showTotal']:
-            sns.lineplot(data=df, x='time', y='total', color='purple', label='Total Seats', linestyle='--')
+            sns.lineplot(data=df, x='time', y='total', color='purple', label='Total Seats', linestyle='--', linewidth=4)
             max_y = df['total'].max()
 
+        sns.lineplot(data=df, x='time', y='waitlisted', color='blue', label='Waitlist', linewidth=1)
+        max_y = max(max_y, df['waitlisted'].max())
+        
         if config[CONFIG_SETTINGS]['useEnrolledTtl']:
             sns.lineplot(data=df, x='time', y='enrolled', color='red', label='Enrolled', linewidth=2)
             max_y = max(df['enrolled'].max(), max_y)
@@ -113,7 +116,6 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
             sns.lineplot(data=df, x='time', y='available', color='red', label='Available', linewidth=2)
             max_y = max(df['available'].max(), max_y)
         
-        sns.lineplot(data=df, x='time', y='waitlisted', color='blue', label='Waitlist', linewidth=2)
 
         plot = plt.gca()
         # Modify plot properties to make it more readable
