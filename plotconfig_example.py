@@ -23,9 +23,10 @@ CONFIG = {
             'n': 'Priorities Start'
         },
 
-        # The last marker must ALWAYS be the "last" event, i.e. no more
-        # events will ever occur after the date corresponding to the last
-        # index of the array corresponding to property 'd'.
+        # If you want to plot the first/second pass data, the last marker
+        # must ALWAYS be the "last" event, i.e. no more events will ever 
+        # occur after the date corresponding to the last index of 
+        # the array corresponding to property 'd'.
         {
             'd': ['2022-02-18', '2022-02-26'],
             't': 22,

@@ -85,7 +85,12 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
         # Read in our CSV file
         df = pd.read_csv(join(from_folder, file))
         if settings['id'] == 'fsp':
-            assert "end" in config[MARKERS][-1][NAME_OF_MARKER].lower()
+            if len(config[MARKERS]) == 0 or "end" not in config[MARKERS][-1][NAME_OF_MARKER].lower():
+                completed += 1
+                print(f'\t\t[{num}] Skipped {file} due to no end marker despite fsp (Completed {completed}/{len(files)}).')
+                continue 
+
+
             end_date_str = config[MARKERS][-1][MARKER_DATES][-1]
             # Parse this date
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
@@ -101,6 +106,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
         # Adjust the figure so it's big enough for display
         plt.figure(figsize=settings['figure_size'])
 
+        max_y = 0
         # Plot the number of available & waitlisted seats
         if config[CONFIG_SETTINGS]['showTotal']:
             sns.lineplot(data=df, x='time', y='total', color='purple', label='Total Seats', linestyle='--', linewidth=4)

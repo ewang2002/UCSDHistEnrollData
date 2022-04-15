@@ -43,8 +43,7 @@ If you only want enrollment data for first and the first week of second pass (an
 Then, run the `run.sh` script with `SP22` as the only argument to get the new cleaned CSV files. Ideally, you would group the CSV files by first- or second-pass time. 
 
 ## Intervals
-- Starting February 11, 2022, expect a roughly **8.5 minute interval** between requests to the same course. *This means that, after I make a request for enrollment data for course X, in roughly 8.5 minutes, I will make another request for enrollment data for the same course X.* In general, there is a 3 second delay between requests, and there are 170 courses total.
-- Starting April 9, 2022, expect a roughly **17 minute interval** between requests to the same course. This is due to the enrollment period for this quarter officially being over, and the fact that I will be tracking the three summer sessions. In general, there is now a 6 second delay between requests instead of a 3 second delay.
+Expect a roughly **8.5 minute interval** between requests to the same course. *This means that, after I make a request for enrollment data for course X, in roughly 8.5 minutes, I will make another request for enrollment data for the same course X.* In general, there is a 3 second delay between requests, and there are 170 courses total.
 
 ## General Notes
 - There may be many CSV files with inaccurate data for the first day or two (e.g. CSE 110, CSE 8A). In particular, it will look like no one has enrolled in the course for the first few days, and then all of a sudden there is a significant drop. This is because I was testing the tracker and associated wrapper functions, which had many logic errors at the time.
