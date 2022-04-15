@@ -19,7 +19,7 @@ GENERAL_SETTINGS = {
     'overall_plot_folder': 'plot_overall',
     'section_plot_folder': 'plot_section',
 
-    'figure_size': (15, 7),
+    'figure_size': (17, 7),
     'num_ticks': 50
 }
 
@@ -37,7 +37,7 @@ FSP_SETTINGS = {
     'overall_plot_folder': 'plot_overall_fsp',
     'section_plot_folder': 'plot_section_fsp',
 
-    'figure_size': (15, 7),
+    'figure_size': (17, 7),
     'num_ticks': 50
 }
 
@@ -128,9 +128,9 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
         title = file.replace('.csv', '')
         if '_' in title:
             course, section = title.split('_')
-            title = f'{course} (Section {section})'
+            title = f'{course}, Section {section}'
 
-        plot.set_title(title)
+        plot.set_title(title + f' ({config[CONFIG_SETTINGS]["termName"]})')
         plot.set_xlabel('Time')
         plot.set_ylabel('Seats')
         plot.grid(True)
@@ -202,8 +202,9 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
                     alpha=0.2, \
                     label=None if spans2[i]['legend'] in seen_shades else spans2[i]['legend'])
                 seen_shades.add(spans2[i]['legend'])
- 
-        plt.legend()
+
+        # https://matplotlib.org/2.0.2/users/legend_guide.html
+        plt.legend(bbox_to_anchor=(1.02, 1), loc=2, borderaxespad=0.)
         # Adjusts the padding
         plt.tight_layout()
 
