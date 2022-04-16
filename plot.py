@@ -112,7 +112,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
             sns.lineplot(data=df, x='time', y='total', color='purple', label='Total Seats', linestyle='--', linewidth=4)
             max_y = df['total'].max()
 
-        sns.lineplot(data=df, x='time', y='waitlisted', color='blue', label='Waitlist', linewidth=1)
+        sns.lineplot(data=df, x='time', y='waitlisted', color='blue', label='Waitlisted', linewidth=1)
         max_y = max(max_y, df['waitlisted'].max())
         
         if config[CONFIG_SETTINGS]['useEnrolledTtl']:
