@@ -1,6 +1,8 @@
 # Special Summer Session 2022 Enrollment Data
 Enrollment data for Special Summer Session 2022. 
 
+Note that nothing here will be plotted due to there being very few courses.
+
 ## Supported Courses
 I only have enrollment data for:
 - Lower- and upper-division CSE courses.
