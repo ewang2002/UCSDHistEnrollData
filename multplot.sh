@@ -8,8 +8,8 @@ for term in ${terms[@]}; do
     python clean_raw_csvs.py $term
     echo -e "\tCategorizing enroll data."
     python enroll_data_cleaner.py $term
-#    echo -e "\tPlotting overall data."
-#    python plot.py $term o
-#    echo -e "\tPlotting section data."
-#    python plot.py $term s
+    echo -e "\tPlotting overall data."
+    python plot.py $term o
+    echo -e "\tPlotting section data."
+    python plot.py $term s
 done
