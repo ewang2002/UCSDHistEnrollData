@@ -53,6 +53,7 @@ LINE_STYLE = 'l'
 LINE_COLOR = 'c'
 NAME_OF_MARKER = 'n'
 CONFIG_SETTINGS = 'settings'
+SHADE = 's'
 
 # Multiprocessing options
 CHUNK_SIZE = 20
@@ -167,11 +168,13 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
                     axis_date = list(filter(lambda x: x[1].strftime("%Y-%m-%d") == date and x[1].hour == hr, all_dates))
                     if len(axis_date) == 0:
                         continue
-                    (spans if p == 0 else spans2).append({
-                        'start': axis_date[0][0],
-                        'color': marker[LINE_COLOR],
-                        'legend': marker[NAME_OF_MARKER],
-                    })
+
+                    if marker[SHADE]:
+                        (spans if p == 0 else spans2).append({
+                            'start': axis_date[0][0],
+                            'color': marker[LINE_COLOR],
+                            'legend': marker[NAME_OF_MARKER],
+                        })
 
                     plt.axvline(x=axis_date[0][0], \
                         color=marker[LINE_COLOR], \

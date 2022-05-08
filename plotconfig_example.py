@@ -20,7 +20,10 @@ CONFIG = {
 
             # The name of this vertical line.
             # This will be shown in the legend.
-            'n': 'Priorities Start'
+            'n': 'Priorities Start',
+            
+            # Whether to shade the area between the previous vertical line and this one.
+            's': False
         },
 
         # If you want to plot the first/second pass data, the last marker

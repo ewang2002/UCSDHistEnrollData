@@ -5,21 +5,24 @@ CONFIG = {
             't': 8,
             'l': (0, (3, 5, 1, 5, 1, 5)),
             'c': '#6a26d1',
-            'n': 'UCSD Students Start'
+            'n': 'UCSD Students Start',
+            's': True
         },
         {
             'd': ['2022-04-18'],
             't': 8,
             'l': (0, (3, 1, 1, 1)),
             'c': '#e0e342',
-            'n': 'Others Start'
+            'n': 'Others Start',
+            's': True
         },
         {
             'd': ['2022-07-25'],
             't': 22,
             'l': 'solid',
             'c': '#000000',
-            'n': 'End'
+            'n': 'End',
+            's': True
         }
     ],
     "settings": {
