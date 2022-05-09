@@ -23,7 +23,7 @@ for f in listdir(raw_path):
     if f.endswith('.csv'):
         new_file_name = join(raw_path, f.replace('.csv', '_fixed.csv'))
         print(f'Cleaning {f}')
-        fix_inconsistent_csv.fix_inconsistent_csv(join(raw_path, f), new_file_name)
+        fix_inconsistent_csv.fix_inconsistent_csv(join(raw_path, f), new_file_name, folder)
 
 cleaned_path = join(folder, 'cleaned')
 
@@ -43,15 +43,20 @@ with open(join(cleaned_path, 'enrollment.csv'), 'w') as f:
     for time in times:
         file = d[time]
         with open(join(raw_path, file), 'r') as g:
-            if init:
-                next(g)
+            lines = g.readlines()
 
-            for line in g:
-                if not init:
-                    f.write(f'{line}')
-                    init = True
-                    continue
-                f.write(f'{line}')
+            if len(lines) == 0:
+                continue
+
+            if init:
+                lines.pop(0)
+            else:
+                f.write(lines[0])
+                init = True
+                lines.pop(0)
+
+            for line in lines:
+                f.write(line)
 
 # And then delete the fixed files from the raw directory
 for file in files:

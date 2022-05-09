@@ -12,7 +12,7 @@ from os.path import exists
 DELTA = 10
 
 
-def fix_inconsistent_csv(file_name: str, output_file_name: str) -> None:
+def fix_inconsistent_csv(file_name: str, output_file_name: str, folder: str) -> None:
     lines_changed = 0
     lined_iterated = 0
     removed = 0
@@ -28,7 +28,11 @@ def fix_inconsistent_csv(file_name: str, output_file_name: str) -> None:
                 #    line[-1] += '\n'
 
                 # invalid csv row
-                if len(line) < 9:
+                if folder == "SP22":
+                    if len(line) < 8:
+                        removed += 1
+                        continue
+                elif (len(line) < 9):
                     removed += 1
                     continue
 
