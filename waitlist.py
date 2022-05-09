@@ -1,5 +1,9 @@
 """
 Calculates the number of students that got off the waitlist for a course.
+
+Note that this is NOT guaranteed to be accurate. You can think of this as
+an estimate of the number of people that actually got off. In reality, this
+will most likely represent a lower bound.
 """
 
 from typing import Tuple
