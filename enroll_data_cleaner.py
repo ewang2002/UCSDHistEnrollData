@@ -29,7 +29,7 @@ if not exists(base_folder):
 cleaned_folder = join(base_folder, CLEANED_FOLDER)
 
 # Key = subject + course code (e.g. CSE 100)
-# Value = Dictionary where key = section code (e.g. A01 or 001)
+# Value = Dictionary where key = section code (e.g. A or 001)
 #         and value = Dictionary where key = time
 #                               and value = [available, waitlisted, total]
 data_by_sec = {}

@@ -1,42 +1,55 @@
+"""
+Calculates the number of students that got off the waitlist for a course.
+"""
+
+from typing import Tuple
 import pandas as pd
 
-# Get term and course from command line
-term = input("Enter term: ").upper()
-course = input("Enter course: ").upper()
-section = input("Enter section: ").upper()
+def get_off_waitlist_ct(filename: str, print_data: bool = False) -> Tuple[int, int]:
+    # Load the CSV file into a dataframe
+    df = pd.read_csv(filename)
 
-# Open the corresponding CSV file
-filename = f"{term}/overall/{course}.csv" if len(section) == 0 else f"{term}/section/{course}_{section}.csv"
+    prev_enrolled = 0
+    prev_waitlist = 0
+    max_total = 0
 
-# Load the CSV file into a dataframe
-df = pd.read_csv(filename)
+    # Iterate over each row in the dataframe
+    num_off = 0
+    for index, row in df.iterrows():
+        if prev_enrolled == 0 and prev_waitlist == 0:
+            prev_enrolled = row["enrolled"]
+            prev_waitlist = row["waitlisted"]
+            continue
 
-prev_enrolled = 0
-prev_waitlist = 0
-max_total = 0
+        # Get 'available', 'waitlisted', 'total'
+        time = row["time"]
+        enrolled = int(row['enrolled'])
+        waitlisted = int(row['waitlisted'])
+        total = int(row['total'])
 
-# Iterate over each row in the dataframe
-num_off = 0
-for index, row in df.iterrows():
-    if prev_enrolled == 0 and prev_waitlist == 0:
-        prev_enrolled = row["enrolled"]
-        prev_waitlist = row["waitlisted"]
-        continue
+        if total > max_total:
+            max_total = total
 
-    # Get 'available', 'waitlisted', 'total'
-    time = row["time"]
-    enrolled = int(row['enrolled'])
-    waitlisted = int(row['waitlisted'])
-    total = int(row['total'])
+        if enrolled > prev_enrolled and waitlisted < prev_waitlist:
+            num_off += enrolled - prev_enrolled
+            if print_data:
+                print(f"[{time}]: {enrolled - prev_enrolled} student(s) got off the waitlist.")
 
-    if total > max_total:
-        max_total = total
+        prev_enrolled = enrolled
+        prev_waitlist = waitlisted
 
-    if enrolled > prev_enrolled and waitlisted < prev_waitlist:
-        num_off += enrolled - prev_enrolled
-        print(f"[{time}]: {enrolled - prev_enrolled} student(s) got off the waitlist.")
+    if print_data:
+        print(f"In total, {num_off} student(s) out of {max_total} students got off the waitlist ({round((num_off / max_total) * 100, 2)}%).")
 
-    prev_enrolled = enrolled
-    prev_waitlist = waitlisted
+    return num_off, max_total
 
-print(f"In total, {num_off} student(s) out of {max_total} students got off the waitlist ({round((num_off / max_total) * 100, 2)}%).")
+
+if __name__ == '__main__':
+    term = input("Enter term: ").upper()
+    course = input("Enter course: ").upper()
+    section = input("Enter section: ").upper()
+
+    # Open the corresponding CSV file
+    if len(section) == 0:
+        print("You need a section to run this script.")
+    get_off_waitlist_ct(f"{term}/individual_sections/{course}_{section}.csv", True)
