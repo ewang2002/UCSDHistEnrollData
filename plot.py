@@ -139,7 +139,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
 
         # Set bottom-left corner to (0, 0)
         plt.xlim(xmin=0)
-        plt.ylim(ymin=0, ymax=1.05*max_y)
+        plt.ylim(ymin=0, ymax=max(1.05*max_y, 1))
 
         # To make the x-axis more readable, purposely hide some dates and then
         # adjust the labels appropriately
@@ -165,7 +165,8 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
                     date = marker[MARKER_DATES][p]
                     # find the first date in all_dates whose date is equal to date
                     # and has the closest hour to hr
-                    axis_date = list(filter(lambda x: x[1].strftime("%Y-%m-%d") == date and x[1].hour == hr, all_dates))
+                    axis_date = list(filter(lambda x: x[1].strftime("%Y-%m-%d") == date and (x[1].hour == hr or\
+                          x[1].hour + 1 == hr or x[1].hour + 2 == hr or x[1].hour + 3 == hr), all_dates))
                     if len(axis_date) == 0:
                         continue
 
