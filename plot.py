@@ -166,7 +166,7 @@ def process_overall(num: int, files: List[str], from_folder: str, out_folder: st
                     # find the first date in all_dates whose date is equal to date
                     # and has the closest hour to hr
                     axis_date = list(filter(lambda x: x[1].strftime("%Y-%m-%d") == date and (x[1].hour == hr or\
-                          x[1].hour + 1 == hr or x[1].hour + 2 == hr or x[1].hour + 3 == hr), all_dates))
+                          x[1].hour == hr + 1 or x[1].hour == hr + 2 or x[1].hour == hr + 3), all_dates))
                     if len(axis_date) == 0:
                         continue
 
