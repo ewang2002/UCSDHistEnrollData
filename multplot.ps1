@@ -21,5 +21,5 @@ foreach ($term in $terms) {
 # commit
 Write-Output "`tCommitting changes."
 git add .
-git commit -m (Get-Date -UFormat "%B %d, %Y - update")
+git commit -m (Get-Date -UFormat "%B %d, %Y - update (plot, automated)")
 git push
