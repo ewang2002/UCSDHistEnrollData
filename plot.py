@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from os import listdir, mkdir
 from os.path import exists, join
 import sys
-from typing import List, Tuple
+from typing import List, Tuple, TypeVar
 from matplotlib import dates
 import pandas as pd
 import seaborn as sns
@@ -60,6 +60,24 @@ CHUNK_SIZE = 20
 WIDE_CHUNK_SIZE = 10
 PROCESS_COUNT = 6
 
+
+T = TypeVar('T')
+def subsets_with_limits(arr: List[T], num_subsets: int, max_per_elem: int) -> List[List[T]]:
+    arr.reverse()
+    subsets = []
+    len_to_use = max(0, len(arr) - max_per_elem * num_subsets)
+    idx = 0
+    while len(arr) > len_to_use:
+        if idx < len(subsets):
+            subsets[idx].append(arr.pop())
+            idx = (idx + 1) % num_subsets
+            continue 
+
+        subsets.append([arr.pop()])
+        idx = (idx + 1) % num_subsets
+    
+    arr.reverse()
+    return subsets
 
 def process_overall(num: int, files: List[str], from_folder: str, out_folder: str, settings, config):
     """
@@ -276,7 +294,10 @@ if __name__ == '__main__':
     all_files = listdir(in_folder)
 
     # If we're working with sections, we only want the files that appear more than once
+    # Categorize each file by the class that they represent.
     if dt == 's':
+        # The key is the course (e.g. CSE 100.csv) and the value is a list
+        # of all sections (e.g. CSE 100_A.csv)
         file_secs = {}
         for file in all_files:
             f_name = file.split('_')[0]
@@ -290,27 +311,24 @@ if __name__ == '__main__':
             if len(file_secs[f_name]) > 1:
                 all_files += file_secs[f_name]
 
-    # Break all_files into chunks of chunk_size
-    chunks = [all_files[i:i + chunk_size] for i in range(0, len(all_files), chunk_size)]
     # Begin running
-    print(f'Breaking {len(all_files)} files into {len(chunks)} chunks of {chunk_size} files each.')
+    print(f'Processing {len(all_files)} files into chunks of {chunk_size} files each.')
     print(f'\tWide? {dt == "sw" or dt == "ow"}')
     print(f'\tInput Folder: {in_folder}')
     print(f'\tPlot Folder: {plot_folder}')
     print(f'\tProcesses: {PROCESS_COUNT}')
 
     completed = 0
-    while completed < len(chunks):
+    while len(all_files) > 0:
+        files_to_process = subsets_with_limits(all_files, PROCESS_COUNT, chunk_size)
         processes = []
         # Limit ourselves to PROCESS_COUNT processes, or else we might
         # end up crashing the host device with too many processes.
-        for i in range(PROCESS_COUNT):
-            if completed + i >= len(chunks):
-                break
-            print(f'Starting process {i} (completed {completed}/{len(chunks)} chunks).')
+        for (i, chunk) in enumerate(files_to_process):
+            print(f'Starting process {i}.')
             # Create a process to process the chunk
             p = Process(target=process_overall, args=(i, \
-                chunks[completed + i], \
+                chunk, \
                 in_folder, \
                 plot_folder, \
                 settings_obj, \
@@ -321,4 +339,5 @@ if __name__ == '__main__':
         # Wait for all processes to finish
         for p in processes:
             p.join()
-            completed += 1
+        completed += sum(len(x) for x in files_to_process)
+        print(f'\t\tCompleted {completed}/{len(all_files)} files.')
