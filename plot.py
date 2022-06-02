@@ -318,6 +318,7 @@ if __name__ == '__main__':
     print(f'\tPlot Folder: {plot_folder}')
     print(f'\tProcesses: {PROCESS_COUNT}')
 
+    len_of_files = len(all_files)
     completed = 0
     while len(all_files) > 0:
         files_to_process = subsets_with_limits(all_files, PROCESS_COUNT, chunk_size)
@@ -325,7 +326,7 @@ if __name__ == '__main__':
         # Limit ourselves to PROCESS_COUNT processes, or else we might
         # end up crashing the host device with too many processes.
         for (i, chunk) in enumerate(files_to_process):
-            print(f'Starting process {i}.')
+            print(f'Starting process {i} (with count {len(chunk)}).')
             # Create a process to process the chunk
             p = Process(target=process_overall, args=(i, \
                 chunk, \
@@ -340,4 +341,4 @@ if __name__ == '__main__':
         for p in processes:
             p.join()
         completed += sum(len(x) for x in files_to_process)
-        print(f'\t\tCompleted {completed}/{len(all_files)} files.')
+        print(f'\t\tCompleted {completed}/{len_of_files} files ({len(all_files)} left).')
