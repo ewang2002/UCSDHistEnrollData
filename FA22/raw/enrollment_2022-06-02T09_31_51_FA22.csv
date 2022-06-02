@@ -1,0 +1,4 @@
+time,subj_course_id,sec_code,sec_id,prof,available,waitlist,total,enrolled_ct
+1654187513767,AAS 10,A01,085689,Butler; Elizabeth Annette,0,0,34,34
+1654187513767,AAS 10,A02,085690,Butler; Elizabeth Annette,0,1,34,34
+1654187514289,AAS 170,A00,085691,Butler; Elizabeth Annette,28,0,32,4
