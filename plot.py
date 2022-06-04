@@ -58,7 +58,7 @@ SHADE = 's'
 # Multiprocessing options
 CHUNK_SIZE = 20
 WIDE_CHUNK_SIZE = 10
-PROCESS_COUNT = 6
+PROCESS_COUNT = 10
 
 
 T = TypeVar('T')
