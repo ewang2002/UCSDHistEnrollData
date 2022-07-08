@@ -25,8 +25,8 @@ do
     fi
 done
 
-# Define an array containing S122, S222, FA22
-terms=("FA22" "S122" "S222")
+# Define an array containing S122, S222, FA22, S122D
+terms=("FA22" "S122" "S222" "S122D")
 
 # Loop through each term
 for term in ${terms[@]}; do

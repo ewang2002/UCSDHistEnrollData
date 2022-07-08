@@ -1,4 +1,4 @@
-$terms = @("FA22", "S122", "S222")
+$terms = @("FA22", "S122", "S222", "S122D")
 
 Write-Output "`tCloning..."
 git clone https://github.com/ewang2002/UCSDHistEnrollData

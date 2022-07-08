@@ -9,7 +9,9 @@ CONFIG = {
             's': True
         },
         {
-            'd': ['2022-07-01'],
+            # Deadline is 07/01/2022 @ 11:59pm, but use 07/02/2022 @ 12am
+            # since it'll look nicer
+            'd': ['2022-07-02'],
             't': 22,
             'l': 'solid',
             'c': '#000000',
