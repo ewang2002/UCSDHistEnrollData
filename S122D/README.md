@@ -1,5 +1,5 @@
 # Summer Session I 2022 Drop Data
-Drop data for Spring 2022. 
+Drop data for Summer Session I 2022. 
 
 Note that, since enrollment has passed, there's not really a point in having this folder aside from seeing the drop rate of certain classes.
 
