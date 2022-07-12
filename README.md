@@ -12,12 +12,10 @@ A repository containing enrollment data for the Spring 2022, Summer 2022, and Fa
 
 Note that **this** repository contains the actual data collected by my [WebReg Scraper](https://github.com/ewang2002/webreg_scraper), along with some Python scripts designed to help clean and analyze the data. The library powering this scraper is [webweg](https://github.com/ewang2002/webweg). If you want to see the other components of this project, click on the corresponding links above.
 
-
-
-
-
 ## Content
 This repository contains CSV files which contains information regarding the number of seats available at some time for certain classes. There are also some scripts designed to help clean and analyze the data. Additionally, there are pre-generated plots of each course that is being tracked.
+
+To see the update status (how frequently I'm updating the CSV files here), check out [this](https://github.com/ewang2002/UCSDHistEnrollData/issues/1) issue.
 
 ### CSV Files
 Each line in a CSV file is a data point that contains the date and time that the data was collected, the course (and section information), the number of students enrolled in that section, the total number of seats available, and the number of students in the waitlist.
@@ -83,15 +81,18 @@ Make sure to get the latest versions of the required software.
       - **Warning:** You should remove lines 3-5 and lines 21-25.
     - If you're using Mac or Linux, you probably want to run [`multplot.sh`](https://github.com/ewang2002/UCSDHistEnrollData/blob/master/multplot.sh).
 
-If you need any help, please create an issue [here](https://github.com/ewang2002/UCSDHistEnrollData/issues). 
+These instructions are not comprehensive, nor were they meant to be; thus, if you need any help, please create an issue [here](https://github.com/ewang2002/UCSDHistEnrollData/issues). 
 
 ## Inspiration
-Several things inspired me to work on this project.
-- As a mathematics-computer science student, I'm not able to directly enroll in a majority of computer science courses. Of course, there are some courses that interest me but I can't directly enroll. As implied by the repository's banner, the UCSD Computer Science and Engineering Department wasn't helpful in giving me information on how fast classes I wanted to take filled up, so I decided to do it myself.
+Several things inspired me to work on this project. 
+- As a mathematics-computer science student, I'm given zero priority when it comes to enrolling in 90% of upper-division computer science courses. I can only enroll >3 weeks after all CSE majors have enrolled, which puts me at a severe disadvantage. Thus, I wanted to see what classes I had a *chance* at enrolling in so I can improve my four-year plan.
+- UCSD's Computer Science and Engineering Department wasn't helpful in giving me information on how fast classes I wanted to take filled up (as seen in the screenshot below), so I decided to collect this information myself.
+<img src="https://github.com/ewang2002/UCSDHistEnrollData/blob/master/assets/thanks_cse.png?raw=true"  alt="Thanks CSE Department for being helpful as always."/>
 - I took [COGS 108: Data Science in Practice](https://github.com/COGS108) with [Professor Jason Fleischer](https://jgfleischer.com/) and learned a lot of things that I wanted to apply, so this project was a good place to start.
 
-## Status
-To see the update status (how frequently I'm updating the CSV files here), check out [this](https://github.com/ewang2002/UCSDHistEnrollData/issues/1) issue.
+## Acknowledgements
+Big thanks to UCSD's [Data & GIS Lab](https://library.ucsd.edu/computing-and-technology/data-and-gis-lab/index.html) for providing me with remote access to their virtual computers.
+
 
 
 ## License
