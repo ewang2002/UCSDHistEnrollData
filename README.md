@@ -88,6 +88,7 @@ Several things inspired me to work on this project.
 - As a mathematics-computer science student, I'm given zero priority when it comes to enrolling in 90% of upper-division computer science courses. I can only enroll >3 weeks after all CSE majors have enrolled, which puts me at a severe disadvantage. Thus, I wanted to see what classes I had a *chance* at enrolling in so I can improve my four-year plan.
 - UCSD's Computer Science and Engineering Department wasn't helpful in giving me information on how fast classes I wanted to take filled up (as seen in the screenshot below), so I decided to collect this information myself.
 <img src="https://github.com/ewang2002/UCSDHistEnrollData/blob/master/assets/thanks_cse.png?raw=true"  alt="Thanks CSE Department for being helpful as always."/>
+
 - I took [COGS 108: Data Science in Practice](https://github.com/COGS108) with [Professor Jason Fleischer](https://jgfleischer.com/) and learned a lot of things that I wanted to apply, so this project was a good place to start.
 
 ## Acknowledgements
