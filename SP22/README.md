@@ -48,6 +48,8 @@ Expect a roughly **8.5 minute interval** between requests to the same course. *T
 ## General Notes
 - There may be many CSV files with inaccurate data for the first day or two (e.g. CSE 110, CSE 8A). In particular, it will look like no one has enrolled in the course for the first few days, and then all of a sudden there is a significant drop. This is because I was testing the tracker and associated wrapper functions, which had many logic errors at the time.
 - Because the cleaned `enrollment.csv` file is too big, it has been omitted. To generate this file again, run `./run.sh SP22`.
+- The one major mistake I made was only collecting the number of available seats (e.g. 17/35 means 17 seats are left) instead of the number of students enrolled (e.g. 17/35 means 17 students are enrolled) for each course. Due to various factors (e.g., some sections may have more students than the limit), collecting the number of students enrolled is significantly more useful than collecting the number of available seats.
+    - Note that `SP22D` and all future terms have the number of students enrolled.
 
 ## Other Remarks
 - I do not have data for Feb. 27 and early Feb. 28. This was due to an issue with WebReg giving me a `shibsp::ListenerException` for the day. That being said, since these two dates are after the first week of second pass, very little should have changed during these times. 
